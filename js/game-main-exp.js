@@ -35,16 +35,17 @@ var DEBUG  = getDebugParams();   // Always start coding in DEBUG mode
 
 let studyId = 'placeHolder';
 
-if (!DEBUG){
-    studyId = 'uci-hri-experiment-1-pilot3';
+if (DEBUG){
+   studyId    = "uci-hri-experiment-2-pilot1-debug";
 } else {
-    studyId = 'uci-hri-experiment-1-pilot3-debug';
+    studyId   = "uci-hri-experiment-2-pilot1";
 }
 // console.log("Study ID: " + studyId);    
 
 
 // database write function
 function writeGameDatabase(){
+    console.log("Writing to database");
     let path1 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/spawnData';
     let path2 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/caughtTargets';
     let path3 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/eventStream';
@@ -55,6 +56,11 @@ function writeGameDatabase(){
 
     let path8 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/AIcaughtTargets';
     let path9 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/AIplayerLocation';
+    
+
+    // AI and Player score
+    let path10 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/aiScore';
+    let path11 = studyId + '/participantData/' + firebaseUserId + '/round' + currentRound + '/playerScore';
 
     writeRealtimeDatabase(path1, spawnData);
     writeRealtimeDatabase(path2, caughtTargets);
@@ -66,7 +72,8 @@ function writeGameDatabase(){
 
     writeRealtimeDatabase(path8, AIcaughtTargets);
     writeRealtimeDatabase(path9, AIplayerLocation);
-
+    writeRealtimeDatabase(path10, aiScore);
+    writeRealtimeDatabase(path11, score);   
 }
 // // Example: storing a numeric value
 // // The result of this is stored on the path: "[studyId]/participantData/[firebaseUserId]/trialData/trial1/ResponseTime"
@@ -130,7 +137,7 @@ let difficultySettings = {
         playerSpeed: 3,
         speedLow:  1.5, // lowest end of object speed distribution
         speedHigh: 3, // highest end of object speed distribution
-        randSeed: 54321},
+        randSeed: 12},
     2: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
         planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
@@ -146,7 +153,7 @@ let difficultySettings = {
         playerSpeed: 3,
         speedLow: 1.5, // lowest end of object speed distribution
         speedHigh: 3, // highest end of object speed distribution
-        randSeed: 54321},
+        randSeed: 123},
     // Add more settings for each level
     3: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
@@ -163,7 +170,7 @@ let difficultySettings = {
         playerSpeed: 3,
         speedLow:  1.5, // lowest end of object speed distribution
         speedHigh: 3, // highest end of object speed distribution
-        randSeed: 54321},
+        randSeed: 1234},
     4: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
         planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
@@ -179,7 +186,7 @@ let difficultySettings = {
         playerSpeed: 3,
         speedLow:  1.5, // lowest end of object speed distribution
         speedHigh: 3, // highest end of object speed distribution
-        randSeed: 54321},
+        randSeed: 12345},
     5: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
         planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
@@ -195,7 +202,7 @@ let difficultySettings = {
         playerSpeed: 3,
         speedLow:  1.5, // lowest end of object speed distribution
         speedHigh: 3, // highest end of object speed distribution
-        randSeed: 54321},
+        randSeed: 123456},
     // Add more settings for each level
     6: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
@@ -212,7 +219,7 @@ let difficultySettings = {
         playerSpeed: 3,
         speedLow:  1.5, // lowest end of object speed distribution
         speedHigh: 3, // highest end of object speed distribution
-        randSeed: 54321},
+        randSeed: 1234567},
 };
 
 // Get the keys for randomization
@@ -277,6 +284,7 @@ const player = {
     speed: 1.5, 
     width:50, 
     height:50,
+    score:0
 };
 const camera = {
     x: world.width / 2,
@@ -315,6 +323,7 @@ const AIplayer = {
     speed: 1.5, 
     width:50, 
     height:50,
+    score:0
 };
 let AIcaughtTargets = [];
 let AIplayerLocation = [];
@@ -385,8 +394,9 @@ async function endGame(advanceRound = false) {
 
     // using this to not block the main thread. 
     // requestIdleCallback(() => {
-        writeGameDatabase();
+        
     // });
+    writeGameDatabase();
 
     if (advanceRound) {
         // round = currentRound;
@@ -406,6 +416,9 @@ async function endGame(advanceRound = false) {
                 playerLocation  = null;
                 score           = null;
                 aiScore         = null;
+                player.score    = null;
+                AIplayer.score  = null
+
 
                 AIcaughtTargets = null;
                 AIplayerLocation = null;
@@ -419,6 +432,9 @@ async function endGame(advanceRound = false) {
                 playerLocation  = [];
                 score           = 0;    
                 aiScore         = 0;
+                player.score    = 0;
+                AIplayer.score  = 0
+
 
                 AIcaughtTargets = [];
                 AIplayerLocation = [];
@@ -532,19 +548,19 @@ function updateObjects(settings) {
     }
 
     if (deltaFrameCount == 0){
-        let newEventObject      = {frame: frameCountGame, time: roundTime, player: {}, objects:{}}; 
-        // append current game condition given the frame
-        // newEventObject.time     = frameCountGame;
-        let curPlayerdata      = player;
-        newEventObject.player   = JSON.parse(JSON.stringify(curPlayerdata));
-
-        let curObjs            = objects.filter(obj => obj.active);
-        newEventObject.objects  = JSON.parse(JSON.stringify(curObjs));
-
-        // console.log("Event Stream Index", (frameCountGame+1)/10);
         const index =  (frameCountGame)/10;
-
         if (index >= 0){
+            let newEventObject      = {frame: frameCountGame, time: roundTime, player: {}, aiPlayer: {}, objects:{}}; 
+            // append current game condition given the frame
+            // write player data
+            let curPlayerdata       = player;
+            newEventObject.player   = JSON.parse(JSON.stringify(curPlayerdata));
+            // write ai data
+            let curAIdata           = AIplayer;
+            newEventObject.aiPlayer = JSON.parse(JSON.stringify(curAIdata));
+            // write all objects on screen
+            let curObjs             = objects.filter(obj => obj.active);
+            newEventObject.objects  = JSON.parse(JSON.stringify(curObjs));
             // console.log("Event Stream Index", index)
             eventStream[index] = newEventObject;
         }
@@ -633,17 +649,23 @@ function updateObjects(settings) {
                 //objects.splice(index, 1); // MS2: commented out this line
                 obj.intercepted = true; // MS2: added this flag
                 score += obj.value;
+                player.score += obj.value;
+
+                let caughtObj = {frame: frameCountGame, target: obj}
                 
                 // console.log("Collision detected!");
-                caughtTargets.push(obj);
+                caughtTargets.push(caughtObj);
             }
 
             if (!obj.AIintercepted && checkCollision(AIplayer, obj)) { // MS5: added a condition
                 // Collision detected
                 obj.AIintercepted = true; // MS2: added this flag             
                 //console.log("AI Collision detected!");
-                AIcaughtTargets.push(obj);
+                let caughtObj = {frame: frameCountGame, target: obj}   
+                AIcaughtTargets.push(caughtObj);
+
                 aiScore += obj.value;
+                AIplayer.score += obj.value;
                 // console.log("AI Score: ", aiScore);
             }
         }
