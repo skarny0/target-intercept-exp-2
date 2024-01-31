@@ -644,7 +644,7 @@ function updateObjects(settings) {
                 //console.log("AI Collision detected!");
                 AIcaughtTargets.push(obj);
                 aiScore += obj.value;
-                console.log("AI Score: ", aiScore);
+                // console.log("AI Score: ", aiScore);
             }
         }
         
