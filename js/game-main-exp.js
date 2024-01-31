@@ -117,7 +117,7 @@ function getDifficultySettingsFromURL() {
 let difficultySettings = {
     1: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
-        planNumFramesAhead: 5, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
+        planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
         AIDisplayMode: 1, // MS4: 0=show movement path; 1=show where to click; 2=show which targets to intercept
         AIMaxDisplayLength: 3, // MS4: can be used to truncate the AI path length shown
         visualizeAIPlayer: 0, // MS5: 0:default; 1=visualize AI player running in background
@@ -133,7 +133,7 @@ let difficultySettings = {
         randSeed: 54321},
     2: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
-        planNumFramesAhead: 5, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
+        planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
         AIDisplayMode: 1, // MS4: 0=show movement path; 1=show where to click; 2=show which targets to intercept
         AIMaxDisplayLength: 3, // MS4: can be used to truncate the AI path length shown
         visualizeAIPlayer: 0, // MS5: 0:default; 1=visualize AI player running in background
@@ -150,7 +150,7 @@ let difficultySettings = {
     // Add more settings for each level
     3: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
-        planNumFramesAhead: 5, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
+        planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
         AIDisplayMode: 1, // MS4: 0=show movement path; 1=show where to click; 2=show which targets to intercept
         AIMaxDisplayLength: 3, // MS4: can be used to truncate the AI path length shown
         visualizeAIPlayer: 0, // MS5: 0:default; 1=visualize AI player running in background
@@ -166,7 +166,7 @@ let difficultySettings = {
         randSeed: 54321},
     4: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
-        planNumFramesAhead: 5, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
+        planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
         AIDisplayMode: 1, // MS4: 0=show movement path; 1=show where to click; 2=show which targets to intercept
         AIMaxDisplayLength: 3, // MS4: can be used to truncate the AI path length shown
         visualizeAIPlayer: 0, // MS5: 0:default; 1=visualize AI player running in background
@@ -182,7 +182,7 @@ let difficultySettings = {
         randSeed: 54321},
     5: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
-        planNumFramesAhead: 5, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
+        planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
         AIDisplayMode: 1, // MS4: 0=show movement path; 1=show where to click; 2=show which targets to intercept
         AIMaxDisplayLength: 3, // MS4: can be used to truncate the AI path length shown
         visualizeAIPlayer: 0, // MS5: 0:default; 1=visualize AI player running in background
@@ -199,7 +199,7 @@ let difficultySettings = {
     // Add more settings for each level
     6: {experiment: 2, // SK: 1=Experiment 1 - no drawing ; 2=Experiments 2 & 3 drawing always on
         AIMode: 1, // MS4: 0=no assistance; 1=always on; 2=adaptive
-        planNumFramesAhead: 5, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
+        planNumFramesAhead: 1, // MS4: plan solution for display a certain number of frames ahead (to allow human response time)
         AIDisplayMode: 1, // MS4: 0=show movement path; 1=show where to click; 2=show which targets to intercept
         AIMaxDisplayLength: 3, // MS4: can be used to truncate the AI path length shown
         visualizeAIPlayer: 0, // MS5: 0:default; 1=visualize AI player running in background
@@ -261,6 +261,7 @@ let mouseX = 0, mouseY = 0;
 
 // Varaiables for HTML elements
 let score = 0;
+let aiScore = 0;
 
 // Player and View Initialization (related to one another)
 const playerSize = 50;
@@ -404,6 +405,7 @@ async function endGame(advanceRound = false) {
                 playerClicks    = null;
                 playerLocation  = null;
                 score           = null;
+                aiScore         = null;
 
                 AIcaughtTargets = null;
                 AIplayerLocation = null;
@@ -416,6 +418,7 @@ async function endGame(advanceRound = false) {
                 playerClicks    = [];
                 playerLocation  = [];
                 score           = 0;    
+                aiScore         = 0;
 
                 AIcaughtTargets = [];
                 AIplayerLocation = [];
@@ -446,7 +449,7 @@ async function endGame(advanceRound = false) {
             $("#survey-main-content").attr("hidden", false);
 
             // Show Survey
-            $('#survey-main-content').load('html/survey.html');
+            $('#survey-main-content').load('html/survey-workload.html');
             
             return;
         }
@@ -640,6 +643,8 @@ function updateObjects(settings) {
                 obj.AIintercepted = true; // MS2: added this flag             
                 //console.log("AI Collision detected!");
                 AIcaughtTargets.push(obj);
+                aiScore += obj.value;
+                console.log("AI Score: ", aiScore);
             }
         }
         

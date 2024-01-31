@@ -211,24 +211,34 @@ $(document).ready(function (){
         
 
         if(DEBUG){
-            $("#task-header").attr("hidden", false);
-            $("#task-main-content").attr("hidden", false);
+            // $("#task-header").attr("hidden", false);
+            // $("#task-main-content").attr("hidden", false);
+
+            // // Load Main Experiment
+            // $('#task-main-content').load('html/game-main-exp.html');
+
 
             // // Write to Database
             // // writeRealtimeDatabase(INTEGRITY_DB_PATH, INTEGRITY_DATA);
 
-            // // Load Main Experiment
-            $('#task-main-content').load('html/game-main-exp.html');
+            
+            $("#instructions-header").attr("hidden", false);
+            $("#instructions-main-content").attr("hidden", false);
 
-            // $("#instructions-header").attr("hidden", false);
-            // $("#instructions-main-content").attr("hidden", false);
+            $('#instructions-main-content').load("html/instructions.html");
+
+            // $("#exp-survey-header").attr("hidden", false);
+            // $("#survey-main-content").attr("hidden", false);
+
+            // // Show Survey
+            // $('#survey-main-content').load('html/survey-workload.html');
 
             // Write to Database
             let path = EXPERIMENT_DATABASE_NAME + '/participantData/' + firebaseUserId + '/consentData';
             writeRealtimeDatabase(path, CONSENT_DATA);
 
-            // Load Instructions
-            $('#instructions-main-content').load("html/instructions.html");
+            // // Load Instructions
+            
             
         }else {
             $("#instructions-header").attr("hidden", false);

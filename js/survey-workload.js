@@ -114,7 +114,7 @@ $(document).ready(function (){
 
         // WRITE TO DATABASE
         writeRealtimeDatabase(
-            SURVEY_DB_PATH + "/selfAssessment",
+            SURVEY_DB_PATH + "/selfAssessment/workload",
             TOPIC_ABILITY_DICT
         );
         writeRealtimeDatabase(
@@ -127,14 +127,18 @@ $(document).ready(function (){
         );
         
         // Hide Instructions
-        $("#exp-survey-header").attr("hidden", true);
-        $("#survey-main-content").attr("hidden", true);
+        // $("#exp-survey-header").attr("hidden", true);
+        // $("#survey-main-content").attr("hidden", true);
         // Show Comprehension Quiz
-        $("#exp-complete-header").attr("hidden", false);
-        $("#task-complete").attr("hidden", false);
+        // $("#exp-complete-header").attr("hidden", false);
+        // $("#task-complete").attr("hidden", false);
 
         // Experiment Completed
-        $('#task-complete').load('html/complete.html');
+        // $('#task-complete').load('html/complete.html');
+
+
+        $('#survey-main-content').load('html/survey-usability.html');
+
     };
     //  Handle Likert Selection for ALL Topics
     $('.likert-topic li input').click(likertTopicAbility);
